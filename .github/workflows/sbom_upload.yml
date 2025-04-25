@@ -52,7 +52,7 @@ jobs:
 
       - name: Bump SBOM version
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           echo "last beach version: ${{ vars.BEACH_LAST_VERSION }}"
           gh variable set BEACH_LAST_VERSION \

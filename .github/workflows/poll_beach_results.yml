@@ -42,7 +42,7 @@ jobs:
         if: ${{ steps.poll.outputs.ready == 'true' }}
         uses: peter-evans/workflow-dispatch@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
           repository: ${{ github.repository }}
           workflow: beach_results.yml
           ref: main
