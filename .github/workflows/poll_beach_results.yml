@@ -1,0 +1,51 @@
+name: Poll Beach API for Results
+
+on:
+  schedule:
+    # run Daily
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  poll_and_dispatch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Poll Beach API results
+        env:
+          BEACH_ID: ${{ secrs.BEACH_ID }}
+          BEACH_ORG_ID: ${{ secrets.BEACH_ORG_ID }}
+          BEACH_API_TOKEN: ${{ secrets.BEACH_API_TOKEN }}
+        id: poll
+        run: |
+          # RESPONSE=$(curl -s \
+          #   -H "Authorization: Bearer $BEACH_API_TOKEN" \
+          #   "https://api.beach.openrefactory.com/v1/beach/result?orgID=${BEACH_ORG_ID}&beachId=${BEACH_ID}")
+          RESPONSE='{"ready": true, "vex_url":"https://some.vex.url","recommendations": [], "sbom_version": 1}'
+
+          echo "ready=$(echo $RESPONSE | jq -r '.ready')" >> $GITHUB_OUTPUT
+          echo "recommendations=$(echo $RESPONSE | jq -c '.recommendations')" >> $GITHUB_OUTPUT
+          echo "vex_url=$(echo $RESPONSE | jq -r '.vex_url')" >> $GITHUB_OUTPUT
+          echo "sbom_version=$(echo $RESPONSE | jq -r '.sbom_version')" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        if: ${{ steps.poll.outputs.sbom_version }} <= ${{ vars.BEACH_LAST_VERSION }}
+        run: |
+          echo "No new SBOM version (latest: ${{ vars.BEACH_LAST_VERSION }}); exiting."
+          exit 0
+
+      - name: Dispatch results workflow if ready
+        if: ${{ steps.poll.outputs.ready == 'true' }}
+        uses: peter-evans/workflow-dispatch@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          workflow: beach_results.yml
+          ref: main
+          inputs: |
+            recommendations: '${{ steps.poll.outputs.recommendations }}'
+            vex_url: '${{ steps.poll.outputs.vex_url }}'

@@ -1,0 +1,35 @@
+name: Process Beach API Results
+
+on:
+  workflow_dispatch:
+    inputs:
+      recommendations:
+        description: "JSON array of { title, detail }"
+        required: true
+      vex_url:
+        description: "URL to the VEX document"
+        required: true
+
+jobs:
+  handle_results:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download VEX document
+        run: |
+          # curl -H "Authorization: Bearer ${{ secrets.BEACH_API_TOKEN }}" \
+          #      -L "${{ github.event.inputs.vex_url }}" \
+          #      -o vex_document.json
+          #
+          # demo vex document
+          echo '{"some":"value", "vex_url": ${{ github.event.inputs.vex_url }} }' > vex_document.json
+
+      - name: Create issues for recommendations
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # create a demo recommendation issue
+          gh issue create \
+          --title "Recommendation title" \
+          --body "${cat vex_document.json}" \
+          --repo $GITHUB_REPOSITORY

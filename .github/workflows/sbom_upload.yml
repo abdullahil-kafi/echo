@@ -1,0 +1,61 @@
+name: SBOM Generation & Upload to Beach Portal
+
+on:
+  # on auto triggers
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches: [main]
+    tags: ["*"]
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+  release:
+    types: [published]
+  # on manual trigger for testing
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  generate_and_upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate SBOM (CycloneDX‑JSON)
+        uses: anchore/sbom-action@v0
+        with:
+          output-file: sbom.json
+          format: cyclonedx-json
+
+      - name: Upload SBOM to Beach API
+        id: upload
+        env:
+          BEACH_ID: ${{ secrets.BEACH_ID }}
+          BEACH_ORG_ID: ${{ secrets.BEACH_ORG_ID }}
+          BEACH_API_TOKEN: ${{ secrets.BEACH_API_TOKEN }}
+        run: |
+          # curl -sSL \
+          #   -X POST "https://api.beach.openrefactory.com/v1/beach/sbom?orgId=${BEACH_ORG_ID}&beachId=${BEACH_ID}" \
+          #   -H "Authorization: Bearer $BEACH_API_TOKEN" \
+          #   -H "Content-Type: application/json" \
+          #   -F 'sbom=@sbom.json;type=application/json'
+          # demo uploading to the beach portal
+          echo "SBOM generated"
+          echo "Total components in sbom: $(cat sbom.json | jq '.components | length')"
+          echo "uploading sbom to the beach portal. beep boop"
+
+      - name: Bump SBOM version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "last beach version: ${{ vars.BEACH_LAST_VERSION }}"
+          gh variable set BEACH_LAST_VERSION \
+            --body "$(( ${{ vars.BEACH_LAST_VERSION }} + 1 ))" \
+            --repo "$GITHUB_REPOSITORY"
+          echo "new beach version: ${{ vars.BEACH_LAST_VERSION }}"
