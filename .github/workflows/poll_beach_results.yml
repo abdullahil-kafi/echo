@@ -45,4 +45,4 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: beach_results.yml
-          inputs: '{"recommendations": ${{ steps.poll.outputs.recommendations }}, "vex_url": "${{ steps.poll.outputs.vex_url }}"'
+          inputs: '{"recommendations": ${{ steps.poll.outputs.recommendations }}, "vex_url": "${{ steps.poll.outputs.vex_url }}"}'
