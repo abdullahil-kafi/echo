@@ -32,14 +32,8 @@ jobs:
           echo "vex_url=$(echo $RESPONSE | jq -r '.vex_url')" >> $GITHUB_OUTPUT
           echo "sbom_version=$(echo $RESPONSE | jq -r '.sbom_version')" >> $GITHUB_OUTPUT
 
-      - name: Compare versions
-        if: ${{ steps.poll.outputs.sbom_version }} <= ${{ vars.BEACH_LAST_VERSION }}
-        run: |
-          echo "No new SBOM version (latest: ${{ vars.BEACH_LAST_VERSION }}, sbom_version: ${{ steps.poll.outputs.sbom_version }} ); exiting."
-          exit 0
-
-      - name: Dispatch results workflow if ready
-        if: ${{ steps.poll.outputs.ready == 'true' }}
+      - name: Dispatch results workflow
+        if: ${{ steps.poll.outputs.ready == 'true' && fromJSON(steps.poll.outputs.sbom_version) <= fromJSON(vars.BEACH_LAST_VERSION) }}
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         uses: benc-uk/workflow-dispatch@v1
