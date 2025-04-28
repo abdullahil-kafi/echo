@@ -5,7 +5,6 @@ on:
     inputs:
       recommendations:
         description: "JSON array of { title, detail }"
-        required: true
       vex_url:
         description: "URL to the VEX document"
         required: true

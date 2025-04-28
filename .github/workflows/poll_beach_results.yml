@@ -25,7 +25,7 @@ jobs:
           # RESPONSE=$(curl -s \
           #   -H "Authorization: Bearer $BEACH_API_TOKEN" \
           #   "https://api.beach.openrefactory.com/v1/beach/result?orgID=${BEACH_ORG_ID}&beachId=${BEACH_ID}")
-          RESPONSE='{"ready": true, "vex_url":"https://some.vex.url","recommendations": {[{"title":"Some title", "details": "Some more details"}]}, "sbom_version": 7}'
+          RESPONSE='{"ready": true, "vex_url":"https://some.vex.url","recommendations": [], "sbom_version": 7}'
 
           echo "ready=$(echo $RESPONSE | jq -r '.ready')" >> $GITHUB_OUTPUT
           echo "recommendations=$(echo $RESPONSE | jq -c '.recommendations')" >> $GITHUB_OUTPUT
