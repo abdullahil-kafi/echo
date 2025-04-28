@@ -35,7 +35,7 @@ jobs:
       - name: Compare versions
         if: ${{ steps.poll.outputs.sbom_version }} <= ${{ vars.BEACH_LAST_VERSION }}
         run: |
-          echo "No new SBOM version (latest: ${{ vars.BEACH_LAST_VERSION }}); exiting."
+          echo "No new SBOM version (latest: ${{ vars.BEACH_LAST_VERSION }}, sbom_version: ${{ steps.poll.outputs.sbom_version }} ); exiting."
           exit 0
 
       - name: Dispatch results workflow if ready
