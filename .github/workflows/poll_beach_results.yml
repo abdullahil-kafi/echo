@@ -40,12 +40,9 @@ jobs:
 
       - name: Dispatch results workflow if ready
         if: ${{ steps.poll.outputs.ready == 'true' }}
-        uses: peter-evans/workflow-dispatch@v1
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        uses: benc-uk/workflow-dispatch@v1
         with:
-          token: ${{ secrets.GH_PAT }}
-          repository: ${{ github.repository }}
           workflow: beach_results.yml
-          ref: main
-          inputs: |
-            recommendations: '${{ steps.poll.outputs.recommendations }}'
-            vex_url: '${{ steps.poll.outputs.vex_url }}'
+          inputs: '{"recommendations": ${{ steps.poll.outputs.recommendations }}, "vex_url": ${{ steps.poll.outputs.vex_url }}'
