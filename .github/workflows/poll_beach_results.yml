@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Poll Beach API results
         env:
-          BEACH_ID: ${{ secrs.BEACH_ID }}
+          BEACH_ID: ${{ secrets.BEACH_ID }}
           BEACH_ORG_ID: ${{ secrets.BEACH_ORG_ID }}
           BEACH_API_TOKEN: ${{ secrets.BEACH_API_TOKEN }}
         id: poll
