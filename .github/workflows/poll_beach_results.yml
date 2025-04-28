@@ -33,7 +33,7 @@ jobs:
           echo "sbom_version=$(echo $RESPONSE | jq -r '.sbom_version')" >> $GITHUB_OUTPUT
 
       - name: Dispatch results workflow
-        if: ${{ steps.poll.outputs.ready == 'true' && fromJSON(steps.poll.outputs.sbom_version) <= fromJSON(vars.BEACH_LAST_VERSION) }}
+        if: ${{ steps.poll.outputs.ready == 'true' && fromJSON(steps.poll.outputs.sbom_version) > fromJSON(vars.BEACH_LAST_VERSION) }}
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         uses: benc-uk/workflow-dispatch@v1
