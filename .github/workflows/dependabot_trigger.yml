@@ -1,0 +1,18 @@
+name: Trigger sbom upload on Dependabot pull-requests
+on: pull_request
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    steps:
+      - name: Dispatch sbom upload
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: sbom_upload.yml
